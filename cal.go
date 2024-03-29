@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	wkds        = []string{"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
-	DaysOfMonth = []string{
+	WeekDayNames = []string{"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"}
+	DaysOfMonth  = []string{
 		" 1", " 2", " 3", " 4", " 5", " 6", " 7", " 8", " 9",
 		"10", "11", "12", "13", "14", "15", "16", "17", "18", "19",
 		"20", "21", "22", "23", "24", "25", "26", "27", "28", "29",
@@ -94,7 +94,7 @@ func printSection(buf *bytes.Buffer, ms ...*M) {
 
 	for i, m := range ms {
 		mh[i] = mid(m.Month(), 20)
-		wh[i] = strings.Join(wkds, " ")
+		wh[i] = strings.Join(WeekDayNames, " ")
 		dr[i] = m.Grid()
 	}
 
@@ -135,7 +135,7 @@ func (m *M) String() string {
 	buf.WriteString("\n")
 
 	// Write header
-	buf.WriteString(strings.Join(wkds, " "))
+	buf.WriteString(strings.Join(WeekDayNames, " "))
 	buf.WriteString("\n")
 
 	for _, v := range m.Grid() {
@@ -151,12 +151,8 @@ func (m M) Month() string {
 }
 
 func (m *M) Grid() [][]string {
-	// First day of month
-	d1 := time.Date(m.year, m.month, 1, 0, 0, 0, 0, time.Local)
-	// Days in a month
-	dim := daysIn(m.year, m.month)
-
-	days := clone(DaysOfMonth[:dim])
+	// Clone days limited by number of days in this month.
+	days := clone(DaysOfMonth[:daysIn(m.year, m.month)])
 
 	// Highlight current day if present
 	t0 := time.Now()
@@ -165,8 +161,11 @@ func (m *M) Grid() [][]string {
 		highlight(days, t0.Day()-1)
 	}
 
+	// First day of month
+	d1 := time.Date(m.year, m.month, 1, 0, 0, 0, 0, time.Local)
+
 	// Create Sun-based padded callendar
-	cal := append(clone(repeat("  ", int(d1.Weekday()))), days...)
+	cal := append(repeat("  ", int(d1.Weekday())), days...)
 
 	// Right pad if required
 	rpad := 42 - len(cal)
