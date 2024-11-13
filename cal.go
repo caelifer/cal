@@ -150,6 +150,7 @@ func (m M) Month() string {
 	return m.month.String()
 }
 
+// Two-dimentional grid of strings representing month's calendar
 func (m *M) Grid() [][]string {
 	// Clone days limited by number of days in this month.
 	days := clone(DaysOfMonth[:daysIn(m.year, m.month)])
@@ -157,21 +158,21 @@ func (m *M) Grid() [][]string {
 	// Highlight current day if present
 	t0 := time.Now()
 	if t0.Year() == m.year && t0.Month() == m.month {
-		// zero-based offset
+		// Day is specified as a zero-based offset
 		highlight(days, t0.Day()-1)
 	}
 
-	// First day of month
+	// Calculate first day of a given month
 	d1 := time.Date(m.year, m.month, 1, 0, 0, 0, 0, time.Local)
 
-	// Create Sun-based padded callendar
+	// Create Sun-first padded callendar representation
 	cal := append(repeat("  ", int(d1.Weekday())), days...)
 
 	// Right pad if required
 	rpad := 42 - len(cal)
 	cal = append(cal, repeat("  ", rpad)...)
 
-	// Construct grid 6x7
+	// Construct a 6x7 grid of days
 	grid := make([][]string, 6)
 	for i := 0; i < 6; i++ {
 		grid[i] = cal[i*7 : (i+1)*7]
@@ -186,6 +187,7 @@ func daysIn(year int, month time.Month) int {
 	return time.Date(year, month+1, 0, 0, 0, 0, 0, time.Local).Day()
 }
 
+// mid centers `msg` string based on `maxLen` width by left padding it with blank characters.
 func mid(msg string, maxLen int) string {
 	// Calculate distance
 	lmsg := len(msg)
@@ -229,8 +231,10 @@ func repeat(s string, n int) []string {
 }
 
 func highlight(dates []string, idx int) {
-	bold := color.New(color.Bold, color.FgBlack, color.BgHiWhite).SprintFunc()
-	dates[idx] = bold(dates[idx])
+	// Select highlight color scheme
+	hl := color.New(color.Bold, color.FgBlack, color.BgHiWhite).SprintFunc()
+	// Highlight specified element
+	dates[idx] = hl(dates[idx])
 }
 
 // vim: :ts=4:sw=4:noexpandtab:ai
