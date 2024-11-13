@@ -187,32 +187,29 @@ func daysIn(year int, month time.Month) int {
 	return time.Date(year, month+1, 0, 0, 0, 0, 0, time.Local).Day()
 }
 
-// mid centers `msg` string based on `maxLen` width by left padding it with blank characters.
-func mid(msg string, maxLen int) string {
+// mid returns a new string with centered `s` based on `width` by left padding it with blank characters.
+func mid(s string, width int) string {
+	// Split str for convenience accessing individual rune
+	runes := []rune(s)
+
 	// Calculate distance
-	lmsg := len(msg)
+	ln := len(runes)
 
 	// If msg don't fit, return truncated msg; special case - return original msg if fit exactly.
-	dis := maxLen - lmsg
+	dis := width - ln
 	if dis <= 0 {
-		return msg[:maxLen]
+		return string(runes[:width])
 	}
 
-	// Prepare new string and splice msg onto it
-	res := make([]rune, maxLen)
-
-	// Offset from left (left padding)
+	// Calculate left offset using integer division (left padding)
 	off := dis / 2
 
-	// Split msg for convenience accessing individual rune
-	rmsg := []rune(msg)
+	// Prepare new blank filled string
+	res := bytes.Runes(bytes.Repeat([]byte{' '}, width))
 
-	for i := 0; i < maxLen; i++ {
-		if i >= off && i < lmsg+off {
-			res[i] = rmsg[i-off]
-		} else {
-			res[i] = ' '
-		}
+	// Splice str's runes starting at the calculated offset
+	for i, r := range runes {
+		res[i+off] = r
 	}
 
 	return string(res)
